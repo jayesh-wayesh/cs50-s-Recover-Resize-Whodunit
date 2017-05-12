@@ -107,6 +107,16 @@ int main(int argc, char *argv[])
                 counter++;
             }
         }
+        
+         // skip over padding, if any
+        fseek(inptr, padding_inp, SEEK_CUR);
+        
+        // write RGB triple to outfile
+        for(int inc = 0; inc < efactor; inc++)
+        {
+           // write RGB triple to outfile
+           fwrite(temp, sizeof(RGBTRIPLE), bi.biWidth, outptr);
+        }
     } 
     
     // success
