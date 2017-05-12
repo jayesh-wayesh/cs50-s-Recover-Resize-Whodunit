@@ -76,6 +76,39 @@ int main(int argc, char *argv[])
     bi.biSizeImage = ((bi.biWidth * sizeof (RGBTRIPLE)) + padding) * abs(bi.biHeight);
     bf.bfSize = bi.biSizeImage + sizeof (BITMAPFILEHEADER) + sizeof (BITMAPINFOHEADER);
     
+    // write outfile's BITMAPFILEHEADER
+    fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
+
+    // write outfile's BITMAPINFOHEADER
+    fwrite(&bi, sizeof(BITMAPINFOHEADER), 1, outptr);
+
+    // allocate memory for temp to hold scanline
+    RGBTRIPLE *temp = malloc(sizeof(RGBTRIPLE) * (bi.biWidth));
+
+    // iterate over infile's scanlines
+    for (int i = 0, biHeight = abs(biHeight_inp); i < biHeight; i++)
+    {
+        // sets counter to 0 after each row
+        int counter = 0;
+        
+        // iterate over pixels in scanline
+        for (int j = 0; j < biWidth_inp; j++)
+        {
+            // temporary storage
+            RGBTRIPLE triple;
+
+            // read RGB triple from infile
+            fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
+            
+             // for writing pixel to temp n times
+            for(int inc = 0; inc < efactor; inc++)
+            {
+                * (temp + counter) = triple;
+                counter++;
+            }
+        }
+    } 
+    
     // success
     return 0;
 }
