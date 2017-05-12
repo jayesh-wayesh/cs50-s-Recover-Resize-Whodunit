@@ -26,6 +26,16 @@ int main (int argc,string argv[])
         if ((buffer[0] == 0xff) && (buffer[1] == 0xd8) && (buffer[2] == 0xff) && ((buffer[3] & 0xf0) == 0xe0)) 
         {
         
+            char filename[10];
+            sprintf(filename, "%03i.jpg", count);
+            
+            pic = fopen(filename, "w");
+            if (pic == NULL) 
+            {
+                fprintf(stderr,"Error! Can't write in file %s\n",filename);
+                return 3;
+            }
+            fwrite(buffer, sizeof(unsigned char), 512, pic);
             
         }
     }
