@@ -13,8 +13,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // remember filenames and enlargement factor
-    int efactor = atoi (argv[1]); // converting value of n to a single integer
+    /* remember filenames and enlargement factor,
+        converting value of n to a single integer */
+    int efactor = atoi (argv[1]); 
     char *infile = argv[2];
     char *outfile = argv[3];
     
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
              // for writing pixel to temp n times
             for(int inc = 0; inc < efactor; inc++)
             {
-                * (temp + counter) = triple;
+                *(temp + counter) = triple;
                 counter++;
             }
         }
@@ -114,11 +115,26 @@ int main(int argc, char *argv[])
         // write RGB triple to outfile
         for(int inc = 0; inc < efactor; inc++)
         {
-           // write RGB triple to outfile
-           fwrite(temp, sizeof(RGBTRIPLE), bi.biWidth, outptr);
+            // write RGB triple to outfile
+            fwrite(temp, sizeof(RGBTRIPLE), bi.biWidth, outptr);
+           
+            // then add padding back (to demonstrate how)
+            for (int k = 0; k < padding; k++)
+            {
+                fputc(0x00, outptr);
+            }
         }
     } 
     
+    // free memory from temp
+    free(temp);
+
+    // close infile
+    fclose(inptr);
+
+    // close outfile
+    fclose(outptr);
+
     // success
     return 0;
 }
