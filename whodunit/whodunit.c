@@ -37,7 +37,25 @@ int main(int argc, char *argv[])
         return 3;
     }
 
-        // write outfile's BITMAPFILEHEADER
+    // read infile's BITMAPFILEHEADER
+    BITMAPFILEHEADER bf;
+    fread(&bf, sizeof(BITMAPFILEHEADER), 1, inptr);
+
+    // read infile's BITMAPINFOHEADER
+    BITMAPINFOHEADER bi;
+    fread(&bi, sizeof(BITMAPINFOHEADER), 1, inptr);
+
+    // ensure infile is (likely) a 24-bit uncompressed BMP 4.0
+    if (bf.bfType != 0x4d42 || bf.bfOffBits != 54 || bi.biSize != 40 || 
+        bi.biBitCount != 24 || bi.biCompression != 0)
+    {
+        fclose(outptr);
+        fclose(inptr);
+        fprintf(stderr, "Unsupported file format.\n");
+        return 4;
+    }
+
+    // write outfile's BITMAPFILEHEADER
     fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
 
     // write outfile's BITMAPINFOHEADER
@@ -54,33 +72,37 @@ int main(int argc, char *argv[])
         {
             // temporary storage
             RGBTRIPLE triple;
-            
 
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
             
-            triple.rgbtGreen = 0x00;
-            
+            // Changing colour
+            if(triple.rgbtRed == 0xff)
+            {
+                triple.rgbtRed = 0x00;
+                triple.rgbtGreen = 0x00;
+            }
+
             // write RGB triple to outfile
             fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
         }
 
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
-        
+
         // then add it back (to demonstrate how)
         for (int k = 0; k < padding; k++)
         {
             fputc(0x00, outptr);
         }
     }
-    
-        // close infile
+
+    // close infile
     fclose(inptr);
 
     // close outfile
     fclose(outptr);
-    
+
     // success
     return 0;
 }
