@@ -67,7 +67,19 @@ int main(int argc, char *argv[])
 
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
+        
+        // then add it back (to demonstrate how)
+        for (int k = 0; k < padding; k++)
+        {
+            fputc(0x00, outptr);
+        }
     }
+    
+        // close infile
+    fclose(inptr);
+
+    // close outfile
+    fclose(outptr);
     
     // success
     return 0;
